@@ -1,0 +1,10 @@
+numpy
+pandas
+tensorflow
+torch
+torchvision
+scikit-learn
+opencv-python
+gymnasium
+carla
+matplotlib
