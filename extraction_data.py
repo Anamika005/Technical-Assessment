@@ -3,26 +3,13 @@ import tensorflow as tf
 import pandas as pd
 import numpy as np
 
-# Base directory = d:\Assesment  (two levels up from this script)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RAW_DIR       = os.path.join(BASE_DIR, "Data", "Raw")
 PROCESSED_DIR = os.path.join(BASE_DIR, "Data", "processed")
 
-# ==========================================
-# FILE PATH
-# ==========================================
-
 TFRECORD_FILE = os.path.join(RAW_DIR, "training_tfexample.tfrecord-00000-of-01000")
 
-# ==========================================
-# LOAD DATASET
-# ==========================================
-
 dataset = tf.data.TFRecordDataset(TFRECORD_FILE)
-
-# ==========================================
-# FEATURES TO EXTRACT
-# ==========================================
 
 feature_description = {
     'state/current/x': tf.io.VarLenFeature(tf.float32),
@@ -31,20 +18,12 @@ feature_description = {
     'state/future/y': tf.io.VarLenFeature(tf.float32),
 }
 
-# ==========================================
-# PARSE FUNCTION
-# ==========================================
-
 def parse_example(example_proto):
 
     return tf.io.parse_single_example(
         example_proto,
         feature_description
     )
-
-# ==========================================
-# EXTRACT DATA
-# ==========================================
 
 data = []
 
@@ -73,10 +52,6 @@ for i, raw_record in enumerate(dataset):
         example['state/future/y']
     ).numpy()
 
-    # ======================================
-    # STORE TRAJECTORY POINTS
-    # ======================================
-
     sequence_length = min(
         len(current_x),
         len(future_x),
@@ -98,10 +73,6 @@ for i, raw_record in enumerate(dataset):
 
         data.append(row)
 
-# ==========================================
-# CREATE DATAFRAME
-# ==========================================
-
 df = pd.DataFrame(data)
 
 print("\nDataset Shape:")
@@ -110,11 +81,6 @@ print(df.shape)
 print("\nFirst 5 Rows:")
 print(df.head())
 
-# ==========================================
-# SAVE CSV
-# ==========================================
-
-# NOTE: saving with the same filename that exists on disk (typo intentional)
 OUTPUT_FILE = os.path.join(PROCESSED_DIR, "trajcetories.csv")
 
 df.to_csv(
